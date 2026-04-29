@@ -1,147 +1,500 @@
-
 import React, { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Search, Car, CheckCircle2, Plus, SlidersHorizontal, BatteryCharging, Gauge, Luggage, Zap, CalendarDays, Heart, X, BarChart3, ClipboardList, Sparkles } from "lucide-react";
+import {
+  Car,
+  Search,
+  Heart,
+  BarChart3,
+  ClipboardList,
+  Home,
+  BatteryCharging,
+  Luggage,
+  Gauge,
+  CalendarDays,
+  Star,
+  Plus,
+  ChevronRight,
+  SlidersHorizontal,
+} from "lucide-react";
 
 const ACCENT = "#FFD23F";
 
 const cars = [
-  { id: 1, brand: "Tesla", model: "Model Y Long Range", year: 2025, type: "Elbil", price: 499900, range: 533, power: 514, boot: 854, seats: 5, awd: true, tow: 1600, status: "Prøvekjørt", score: 88, tags: ["rekkevidde", "plass", "awd"] },
-  { id: 2, brand: "Volvo", model: "EX40 Twin Motor", year: 2025, type: "Elbil", price: 559000, range: 538, power: 408, boot: 410, seats: 5, awd: true, tow: 1800, status: "Favoritt", score: 84, tags: ["trygghet", "premium", "awd"] },
-  { id: 3, brand: "Skoda", model: "Enyaq 85x", year: 2025, type: "Elbil", price: 529000, range: 540, power: 286, boot: 585, seats: 5, awd: true, tow: 1200, status: "Interessert", score: 86, tags: ["familie", "komfort", "praktisk"] },
-  { id: 4, brand: "BMW", model: "iX1 xDrive30", year: 2025, type: "Elbil", price: 589000, range: 438, power: 313, boot: 490, seats: 5, awd: true, tow: 1200, status: "Skal sjekkes", score: 79, tags: ["premium", "kompakt", "kjøreglede"] }
+  {
+    id: 1,
+    brand: "Tesla",
+    model: "Model Y Long Range",
+    price: 499900,
+    range: 533,
+    boot: 854,
+    power: 514,
+    status: "prøvekjørt",
+    score: 88,
+    note: "Best på plass og totalverdi.",
+  },
+  {
+    id: 2,
+    brand: "Volvo",
+    model: "EX40 Twin Motor",
+    price: 559000,
+    range: 538,
+    boot: 410,
+    power: 408,
+    status: "favoritt",
+    score: 84,
+    note: "Trygg, premium og kompakt.",
+  },
+  {
+    id: 3,
+    brand: "Skoda",
+    model: "Enyaq 85x",
+    price: 529000,
+    range: 540,
+    boot: 585,
+    power: 286,
+    status: "interessert",
+    score: 86,
+    note: "Veldig praktisk familiebil.",
+  },
 ];
 
-const statuses = ["Alle", "Interessert", "Skal sjekkes", "Booket", "Prøvekjørt", "Favoritt", "Forkastet"];
-
-function formatPrice(value) {
+function price(value) {
   return new Intl.NumberFormat("nb-NO").format(value) + " kr";
 }
 
-function Button({ children, className = "", ...props }) {
-  return <button className={`inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold transition ${className}`} {...props}>{children}</button>;
+function PhoneFrame({ children }) {
+  return (
+    <div className="mx-auto w-full max-w-[410px] rounded-[3rem] border border-[#2B2B3D] bg-[#050509] p-3 shadow-2xl shadow-black/50">
+      <div className="relative h-[820px] overflow-hidden rounded-[2.35rem] border border-[#1F1F2E] bg-[#0A0A0F]">
+        <div className="absolute left-1/2 top-2 z-30 h-7 w-32 -translate-x-1/2 rounded-full bg-black" />
+        {children}
+      </div>
+    </div>
+  );
 }
 
-function ScoreRing({ score }) {
-  const deg = Math.round((score / 100) * 360);
+function TopBar() {
   return (
-    <div className="relative grid h-16 w-16 place-items-center rounded-full" style={{ background: `conic-gradient(${ACCENT} ${deg}deg, #252538 ${deg}deg)` }}>
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-[#111118] text-sm font-bold text-[#F0F0FF]">{score}</div>
+    <div className="flex items-center justify-between px-5 pt-12">
+      <div>
+        <p className="text-xs text-[#8888AA]">din biloversikt</p>
+        <h1 className="font-mono text-2xl font-bold text-[#F0F0FF]">
+          carctrl
+        </h1>
+      </div>
+      <div
+        className="grid h-11 w-11 place-items-center rounded-2xl border border-[#3A3A4E] bg-[#111118]"
+        style={{ boxShadow: `0 0 36px ${ACCENT}22` }}
+      >
+        <Car className="h-6 w-6" style={{ color: ACCENT }} />
+      </div>
     </div>
   );
 }
 
 function Metric({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-2xl border border-[#1C1C30] bg-[#0A0A0F]/60 p-3">
-      <div className="mb-1 flex items-center gap-2 text-xs text-[#8888AA]"><Icon className="h-3.5 w-3.5" /> {label}</div>
-      <div className="text-sm font-semibold text-[#F0F0FF]">{value}</div>
+    <div className="rounded-2xl border border-[#242438] bg-[#111118] p-3">
+      <Icon className="mb-2 h-4 w-4" style={{ color: ACCENT }} />
+      <p className="text-[11px] text-[#8888AA]">{label}</p>
+      <p className="text-sm font-semibold text-[#F0F0FF]">{value}</p>
     </div>
   );
 }
 
-function CarCard({ car, selected, onToggle }) {
+function CarMiniCard({ car }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="overflow-hidden rounded-3xl border border-[#1C1C30] bg-[#111118] text-[#F0F0FF] shadow-2xl shadow-black/20">
-        <div className="relative h-36 bg-gradient-to-br from-[#1a1a24] via-[#101018] to-[#0A0A0F] p-5">
-          <div className="absolute right-5 top-5 rounded-full border border-[#34344A] bg-black/20 px-3 py-1 text-xs">{car.status}</div>
-          <div className="absolute bottom-4 left-5 right-5">
-            <div className="mb-3 flex h-16 items-end justify-center rounded-2xl border border-[#2A2A3C] bg-[#0A0A0F]/70">
-              <Car className="mb-3 h-10 w-10" style={{ color: ACCENT }} />
-            </div>
-          </div>
+    <div className="rounded-[1.7rem] border border-[#242438] bg-[#111118] p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#0A0A0F]">
+          <Car className="h-8 w-8" style={{ color: ACCENT }} />
         </div>
-
-        <div className="p-5">
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.28em] text-[#8888AA]">{car.brand}</p>
-              <h3 className="mt-1 text-xl font-bold leading-tight">{car.model}</h3>
-              <p className="mt-1 text-sm text-[#8888AA]">{car.year} · {car.type} · {formatPrice(car.price)}</p>
-            </div>
-            <ScoreRing score={car.score} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <Metric icon={BatteryCharging} label="Rekkevidde" value={`${car.range} km`} />
-            <Metric icon={Luggage} label="Bagasje" value={`${car.boot} liter`} />
-            <Metric icon={Gauge} label="Effekt" value={`${car.power} hk`} />
-            <Metric icon={Zap} label="Henger" value={`${car.tow} kg`} />
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {car.tags.map((tag) => <span key={tag} className="rounded-full border border-[#2A2A3C] px-3 py-1 text-xs text-[#DADAF0]">#{tag}</span>)}
-          </div>
-
-          <div className="mt-5 flex gap-2">
-            <Button onClick={() => onToggle(car.id)} className="flex-1 bg-[#F0F0FF] text-[#0A0A0F] hover:bg-white">
-              {selected ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <BarChart3 className="mr-2 h-4 w-4" />}
-              {selected ? "Valgt" : "Sammenlign"}
-            </Button>
-            <Button className="border border-[#2A2A3C] bg-transparent text-[#F0F0FF] hover:bg-[#1A1A24]"><ClipboardList className="h-4 w-4" /></Button>
-          </div>
+        <div className="rounded-full bg-[#FFD23F18] px-3 py-1 text-xs font-semibold text-[#FFD23F]">
+          {car.score}/100
         </div>
       </div>
-    </motion.div>
+
+      <p className="text-xs uppercase tracking-[0.22em] text-[#8888AA]">
+        {car.brand}
+      </p>
+      <h3 className="mt-1 text-lg font-bold leading-tight text-[#F0F0FF]">
+        {car.model}
+      </h3>
+      <p className="mt-1 text-sm text-[#8888AA]">{price(car.price)}</p>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-[#0A0A0F] p-2">
+          <p className="text-[10px] text-[#8888AA]">rekkevidde</p>
+          <p className="text-xs font-bold text-[#F0F0FF]">{car.range} km</p>
+        </div>
+        <div className="rounded-xl bg-[#0A0A0F] p-2">
+          <p className="text-[10px] text-[#8888AA]">bagasje</p>
+          <p className="text-xs font-bold text-[#F0F0FF]">{car.boot} l</p>
+        </div>
+        <div className="rounded-xl bg-[#0A0A0F] p-2">
+          <p className="text-[10px] text-[#8888AA]">effekt</p>
+          <p className="text-xs font-bold text-[#F0F0FF]">{car.power} hk</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function ComparePanel({ selectedCars, onClear }) {
-  if (selectedCars.length === 0) return null;
+function HomeScreen() {
+  const best = cars[0];
+
   return (
-    <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="fixed bottom-5 left-1/2 z-20 w-[calc(100%-2rem)] max-w-5xl -translate-x-1/2 rounded-3xl border border-[#2A2A3C] bg-[#111118]/95 p-4 text-[#F0F0FF] shadow-2xl backdrop-blur-xl">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div><p className="text-xs uppercase tracking-[0.25em]" style={{ color: ACCENT }}>Sammenligning</p><h3 className="text-lg font-bold">{selectedCars.length} biler valgt</h3></div>
-        <div className="flex flex-1 gap-2 overflow-x-auto">
-          {selectedCars.map((car) => <div key={car.id} className="min-w-44 rounded-2xl border border-[#252538] bg-[#0A0A0F] p-3"><p className="text-sm font-semibold">{car.brand} {car.model}</p><p className="text-xs text-[#8888AA]">Score {car.score} · {car.range} km</p></div>)}
+    <div className="h-full overflow-y-auto pb-28">
+      <TopBar />
+
+      <section className="px-5 pt-6">
+        <div className="rounded-[2rem] border border-[#2D2D42] bg-gradient-to-br from-[#1A1A24] to-[#0D0D14] p-5">
+          <div className="mb-5 flex items-start justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-[#FFD23F]">
+                beste match
+              </p>
+              <h2 className="mt-2 text-2xl font-bold leading-tight text-[#F0F0FF]">
+                {best.brand}
+                <br />
+                {best.model}
+              </h2>
+              <p className="mt-2 text-sm text-[#8888AA]">{best.note}</p>
+            </div>
+            <div className="grid h-16 w-16 place-items-center rounded-full bg-[#FFD23F] text-lg font-black text-[#0A0A0F]">
+              {best.score}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <Metric icon={BatteryCharging} label="range" value={`${best.range} km`} />
+            <Metric icon={Luggage} label="bagasje" value={`${best.boot} l`} />
+            <Metric icon={Gauge} label="effekt" value={`${best.power} hk`} />
+          </div>
         </div>
-        <div className="flex gap-2"><Button className="text-[#0A0A0F]" style={{ backgroundColor: ACCENT }}>Åpne tabell</Button><Button onClick={onClear} className="border border-[#2A2A3C] bg-transparent text-[#F0F0FF]"><X className="h-4 w-4" /></Button></div>
+      </section>
+
+      <section className="px-5 pt-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-[#F0F0FF]">du vurderer</h2>
+          <p className="text-sm text-[#8888AA]">{cars.length} biler</p>
+        </div>
+
+        <div className="space-y-3">
+          {cars.map((car) => (
+            <div
+              key={car.id}
+              className="flex items-center gap-3 rounded-3xl border border-[#242438] bg-[#111118] p-3"
+            >
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#0A0A0F]">
+                <Car className="h-7 w-7" style={{ color: ACCENT }} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-[#F0F0FF]">
+                  {car.brand} {car.model}
+                </p>
+                <p className="text-xs text-[#8888AA]">
+                  {car.status} · {car.range} km · {price(car.price)}
+                </p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-[#55556F]" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="px-5 pt-6">
+        <div className="rounded-[1.8rem] border border-[#242438] bg-[#111118] p-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#0A0A0F]">
+              <CalendarDays className="h-6 w-6" style={{ color: ACCENT }} />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-[#F0F0FF]">
+                neste prøvekjøring
+              </p>
+              <p className="text-xs text-[#8888AA]">
+                Volvo EX40 · fredag 14:00
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SearchScreen() {
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    return cars.filter((car) =>
+      `${car.brand} ${car.model}`.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [query]);
+
+  return (
+    <div className="h-full overflow-y-auto pb-28">
+      <TopBar />
+
+      <section className="px-5 pt-6">
+        <h2 className="mb-4 text-2xl font-bold text-[#F0F0FF]">
+          finn bilen som passer deg
+        </h2>
+
+        <div className="flex items-center gap-3 rounded-3xl border border-[#2A2A3C] bg-[#111118] px-4 py-4">
+          <Search className="h-5 w-5 text-[#8888AA]" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="søk merke eller modell"
+            className="w-full bg-transparent text-sm text-[#F0F0FF] outline-none placeholder:text-[#55556F]"
+          />
+          <SlidersHorizontal className="h-5 w-5 text-[#8888AA]" />
+        </div>
+
+        <div className="mt-4 flex gap-2 overflow-x-auto">
+          {["elbil", "familie", "awd", "rekkevidde", "premium"].map((tag) => (
+            <button
+              key={tag}
+              className="whitespace-nowrap rounded-full border border-[#2A2A3C] bg-[#111118] px-4 py-2 text-sm text-[#DADAF0]"
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4 px-5 pt-6">
+        {filtered.map((car) => (
+          <CarMiniCard key={car.id} car={car} />
+        ))}
+      </section>
+    </div>
+  );
+}
+
+function ShortlistScreen() {
+  return (
+    <div className="h-full overflow-y-auto pb-28">
+      <TopBar />
+
+      <section className="px-5 pt-6">
+        <h2 className="mb-4 text-2xl font-bold text-[#F0F0FF]">
+          shortlist
+        </h2>
+
+        <div className="space-y-4">
+          {cars.map((car) => (
+            <div
+              key={car.id}
+              className="rounded-[1.7rem] border border-[#242438] bg-[#111118] p-4"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.22em] text-[#8888AA]">
+                    {car.status}
+                  </p>
+                  <h3 className="mt-1 text-lg font-bold text-[#F0F0FF]">
+                    {car.brand} {car.model}
+                  </h3>
+                </div>
+                <Heart className="h-6 w-6 text-[#FFD23F]" />
+              </div>
+
+              <p className="mb-4 text-sm text-[#8888AA]">{car.note}</p>
+
+              <div className="h-2 overflow-hidden rounded-full bg-[#242438]">
+                <div
+                  className="h-full rounded-full bg-[#FFD23F]"
+                  style={{ width: `${car.score}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-[#8888AA]">
+                personlig matchscore: {car.score}/100
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function CompareScreen() {
+  const left = cars[0];
+  const right = cars[2];
+
+  const rows = [
+    ["pris", price(left.price), price(right.price)],
+    ["rekkevidde", `${left.range} km`, `${right.range} km`],
+    ["bagasje", `${left.boot} liter`, `${right.boot} liter`],
+    ["effekt", `${left.power} hk`, `${right.power} hk`],
+    ["score", `${left.score}/100`, `${right.score}/100`],
+  ];
+
+  return (
+    <div className="h-full overflow-y-auto pb-28">
+      <TopBar />
+
+      <section className="px-5 pt-6">
+        <h2 className="mb-4 text-2xl font-bold text-[#F0F0FF]">
+          sammenlign
+        </h2>
+
+        <div className="grid grid-cols-2 gap-3">
+          {[left, right].map((car) => (
+            <div
+              key={car.id}
+              className="rounded-[1.6rem] border border-[#242438] bg-[#111118] p-4"
+            >
+              <Car className="mb-4 h-8 w-8" style={{ color: ACCENT }} />
+              <p className="text-xs text-[#8888AA]">{car.brand}</p>
+              <h3 className="text-base font-bold leading-tight text-[#F0F0FF]">
+                {car.model}
+              </h3>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-[1.6rem] border border-[#242438] bg-[#111118]">
+          {rows.map((row) => (
+            <div
+              key={row[0]}
+              className="grid grid-cols-3 border-b border-[#242438] px-4 py-4 last:border-b-0"
+            >
+              <p className="text-xs text-[#8888AA]">{row[0]}</p>
+              <p className="text-right text-sm font-semibold text-[#F0F0FF]">
+                {row[1]}
+              </p>
+              <p className="text-right text-sm font-semibold text-[#F0F0FF]">
+                {row[2]}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function TestDriveScreen() {
+  return (
+    <div className="h-full overflow-y-auto pb-28">
+      <TopBar />
+
+      <section className="px-5 pt-6">
+        <h2 className="mb-4 text-2xl font-bold text-[#F0F0FF]">
+          prøvekjøring
+        </h2>
+
+        <div className="rounded-[1.8rem] border border-[#242438] bg-[#111118] p-5">
+          <p className="text-xs uppercase tracking-[0.22em] text-[#FFD23F]">
+            aktiv vurdering
+          </p>
+          <h3 className="mt-2 text-xl font-bold text-[#F0F0FF]">
+            Volvo EX40 Twin Motor
+          </h3>
+          <p className="mt-2 text-sm text-[#8888AA]">
+            Registrer inntrykkene dine rett etter prøvekjøring.
+          </p>
+        </div>
+
+        <div className="mt-5 space-y-4">
+          {["komfort", "plass", "støy", "kjørefølelse", "infotainment"].map(
+            (label, index) => (
+              <div
+                key={label}
+                className="rounded-[1.4rem] border border-[#242438] bg-[#111118] p-4"
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-[#F0F0FF]">
+                    {label}
+                  </p>
+                  <p className="text-sm text-[#FFD23F]">{8 - index}/10</p>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-[#242438]">
+                  <div
+                    className="h-full rounded-full bg-[#FFD23F]"
+                    style={{ width: `${(8 - index) * 10}%` }}
+                  />
+                </div>
+              </div>
+            )
+          )}
+        </div>
+
+        <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-3xl bg-[#FFD23F] px-5 py-4 font-bold text-[#0A0A0F]">
+          <Plus className="h-5 w-5" />
+          lagre vurdering
+        </button>
+      </section>
+    </div>
+  );
+}
+
+function BottomNav({ active, setActive }) {
+  const items = [
+    ["home", Home, "hjem"],
+    ["search", Search, "søk"],
+    ["shortlist", Heart, "liste"],
+    ["compare", BarChart3, "match"],
+    ["test", ClipboardList, "test"],
+  ];
+
+  return (
+    <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-[#242438] bg-[#0A0A0F]/95 px-3 pb-5 pt-3 backdrop-blur-xl">
+      <div className="grid grid-cols-5 gap-1">
+        {items.map(([key, Icon, label]) => {
+          const isActive = active === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setActive(key)}
+              className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px]"
+              style={{
+                color: isActive ? ACCENT : "#777791",
+                background: isActive ? "#FFD23F14" : "transparent",
+              }}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </button>
+          );
+        })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
 export default function App() {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("Alle");
-  const [selected, setSelected] = useState([1, 3]);
+  const [active, setActive] = useState("home");
 
-  const filtered = useMemo(() => cars.filter((car) => {
-    const text = `${car.brand} ${car.model} ${car.tags.join(" ")}`.toLowerCase();
-    return text.includes(query.toLowerCase()) && (status === "Alle" || car.status === status);
-  }), [query, status]);
-
-  const selectedCars = cars.filter((car) => selected.includes(car.id));
-  const toggleSelected = (id) => setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : current.length < 4 ? [...current, id] : current);
+  const screens = {
+    home: <HomeScreen />,
+    search: <SearchScreen />,
+    shortlist: <ShortlistScreen />,
+    compare: <CompareScreen />,
+    test: <TestDriveScreen />,
+  };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#F0F0FF]">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,210,63,0.16),transparent_34%),radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.06),transparent_24%)]" />
-      <main className="relative mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-10">
-        <header className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="grid h-14 w-14 place-items-center rounded-3xl border border-[#39394A] bg-[#111118] shadow-xl" style={{ boxShadow: `0 0 48px ${ACCENT}22` }}><Car className="h-7 w-7" style={{ color: ACCENT }} /></div>
-            <div><h1 className="font-mono text-3xl font-bold tracking-tight">carctrl</h1><p className="text-sm text-[#8888AA]">Finn riktig bil. Ikke bare neste bil.</p></div>
-          </div>
-          <div className="flex gap-2"><Button className="border border-[#2A2A3C] bg-[#111118] text-[#F0F0FF] hover:bg-[#1A1A24]"><CalendarDays className="mr-2 h-4 w-4" /> Prøvekjøringer</Button><Button className="text-[#0A0A0F]" style={{ backgroundColor: ACCENT }}><Plus className="mr-2 h-4 w-4" /> Legg til bil</Button></div>
-        </header>
+    <div className="min-h-screen bg-[#050509] px-4 py-8 text-[#F0F0FF]">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,210,63,0.18),transparent_34%)]" />
 
-        <section className="mb-8 grid gap-4 md:grid-cols-[1.4fr_0.8fr_0.8fr]">
-          <div className="rounded-3xl border border-[#1C1C30] bg-[#111118] p-5"><div className="mb-4 flex items-center gap-2 text-sm text-[#8888AA]"><Search className="h-4 w-4" /> Søk i bilmarkedet</div><div className="flex items-center gap-3 rounded-2xl border border-[#2A2A3C] bg-[#0A0A0F] px-4 py-3"><Search className="h-5 w-5 text-[#8888AA]" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Søk merke, modell, familie, rekkevidde..." className="w-full bg-transparent text-sm outline-none placeholder:text-[#55556F]" /><SlidersHorizontal className="h-5 w-5 text-[#8888AA]" /></div></div>
-          <div className="rounded-3xl border border-[#1C1C30] bg-[#111118] p-5"><div className="mb-1 flex items-center gap-2 text-sm text-[#8888AA]"><Heart className="h-4 w-4" /> Shortlist</div><p className="text-3xl font-bold">{cars.length}</p><p className="text-sm text-[#8888AA]">biler vurderes nå</p></div>
-          <div className="rounded-3xl border border-[#1C1C30] bg-[#111118] p-5"><div className="mb-1 flex items-center gap-2 text-sm text-[#8888AA]"><Sparkles className="h-4 w-4" /> Beste match</div><p className="text-lg font-bold">Tesla Model Y</p><p className="text-sm text-[#8888AA]">88/100 basert på dine behov</p></div>
-        </section>
+      <div className="relative mx-auto mb-6 max-w-xl text-center">
+        <p className="text-xs uppercase tracking-[0.3em] text-[#FFD23F]">
+          mobil prototype
+        </p>
+        <h1 className="mt-2 font-mono text-4xl font-bold">carctrl</h1>
+        <p className="mt-2 text-sm text-[#8888AA]">
+          finn, vurder, prøvekjør og sammenlign biler.
+        </p>
+      </div>
 
-        <section className="mb-6 flex gap-2 overflow-x-auto pb-1">
-          {statuses.map((item) => <button key={item} onClick={() => setStatus(item)} className="whitespace-nowrap rounded-full border px-4 py-2 text-sm transition" style={{ borderColor: status === item ? ACCENT : "#2A2A3C", background: status === item ? `${ACCENT}18` : "#111118", color: status === item ? ACCENT : "#DADAF0" }}>{item}</button>)}
-        </section>
-
-        <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {filtered.map((car) => <CarCard key={car.id} car={car} selected={selected.includes(car.id)} onToggle={toggleSelected} />)}
-        </section>
-      </main>
-      <ComparePanel selectedCars={selectedCars} onClear={() => setSelected([])} />
+      <PhoneFrame>
+        {screens[active]}
+        <BottomNav active={active} setActive={setActive} />
+      </PhoneFrame>
     </div>
   );
 }
