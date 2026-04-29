@@ -1,194 +1,216 @@
 import React, { useState } from "react";
 import {
-  Car,
+  Home,
   Search,
-  Sparkles,
-  Gauge,
-  BatteryCharging,
+  Heart,
+  User,
+  Car,
+  Zap,
+  Users,
+  Coins,
+  MapPin,
   ShieldCheck,
   ChevronRight,
   SlidersHorizontal,
-  Star,
-  Zap,
+  Plus,
 } from "lucide-react";
-import { motion } from "framer-motion";
-
-const ACCENT = "#FFB84D";
 
 const cars = [
   {
     name: "Volvo EX30",
-    type: "Elbil · SUV",
-    score: 94,
-    price: "fra 329 900 kr",
+    type: "kompakt el-suv",
+    match: 94,
+    price: "329 900 kr",
     range: "480 km",
-    cost: "2,1 kr/km",
-    tag: "beste totalvalg",
+    tag: "beste match",
   },
   {
     name: "Tesla Model Y",
-    type: "Elbil · Familie",
-    score: 91,
-    price: "fra 429 990 kr",
+    type: "familie · elbil",
+    match: 91,
+    price: "429 990 kr",
     range: "533 km",
-    cost: "2,3 kr/km",
     tag: "mest plass",
   },
   {
     name: "Toyota Yaris Cross",
-    type: "Hybrid · Kompakt",
-    score: 86,
-    price: "fra 339 000 kr",
+    type: "hybrid · trygg",
+    match: 86,
+    price: "339 000 kr",
     range: "hybrid",
-    cost: "3,0 kr/km",
-    tag: "trygt kjøp",
+    tag: "lav risiko",
   },
 ];
 
-function App() {
-  const [active, setActive] = useState("smart");
+const needs = [
+  { label: "elbil", icon: Zap },
+  { label: "familie", icon: Users },
+  { label: "billigst", icon: Coins },
+  { label: "bybil", icon: MapPin },
+];
+
+export default function App() {
+  const [activeNeed, setActiveNeed] = useState("elbil");
 
   return (
-    <main className="min-h-screen bg-[#0A0A0F] text-[#F0F0FF] overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-[#FFB84D]/20 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-[#4D9FFF]/10 blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-[#050509] text-[#F0F0FF]">
+      <div className="mx-auto min-h-screen max-w-[430px] bg-[#0A0A0F] relative overflow-hidden border-x border-[#1C1C30]">
+        <div className="absolute -top-32 left-16 h-64 w-64 rounded-full bg-[#FFB84D]/20 blur-3xl" />
 
-      <section className="relative mx-auto flex min-h-screen max-w-md flex-col px-5 py-5">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#2A2A3D] bg-[#111118] shadow-xl">
-              <Car size={22} color={ACCENT} />
-            </div>
+        <header className="sticky top-0 z-20 bg-[#0A0A0F]/90 backdrop-blur-xl px-5 pt-5 pb-4 border-b border-[#1C1C30]">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="font-mono text-lg tracking-tight">
+              <p className="font-mono text-xl">
                 car<span className="text-[#FFB84D]">ctrl</span>
-              </div>
-              <p className="text-xs text-[#8888AA]">bilvalg under kontroll</p>
+              </p>
+              <p className="text-xs text-[#8888AA]">finn riktig bil</p>
             </div>
+
+            <button className="grid h-11 w-11 place-items-center rounded-2xl bg-[#111118] border border-[#1C1C30]">
+              <User size={19} />
+            </button>
           </div>
 
-          <button className="rounded-full border border-[#1C1C30] bg-[#111118] px-3 py-2 text-xs text-[#8888AA]">
-            beta
-          </button>
-        </header>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="mt-9"
-        >
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#2A2A3D] bg-[#111118]/80 px-3 py-1.5 text-xs text-[#8888AA]">
-            <Sparkles size={14} color={ACCENT} />
-            smart anbefaling basert på behov
-          </p>
-
-          <h1 className="text-5xl font-black leading-[0.95] tracking-tight">
-            finn bilen som faktisk passer deg.
-          </h1>
-
-          <p className="mt-5 text-base leading-7 text-[#B7B7D6]">
-            carctrl hjelper deg å sammenligne pris, rekkevidde, plass,
-            trygghet og totale kostnader — uten bilsjargong.
-          </p>
-        </motion.div>
-
-        <div className="mt-7 rounded-[2rem] border border-[#1C1C30] bg-[#111118]/90 p-3 shadow-2xl backdrop-blur">
-          <div className="flex items-center gap-3 rounded-2xl bg-[#0A0A0F] px-4 py-4">
+          <div className="mt-5 flex items-center gap-3 rounded-2xl bg-[#111118] border border-[#1C1C30] px-4 py-3">
             <Search size={18} className="text-[#8888AA]" />
             <input
-              placeholder="søk bil, budsjett eller behov"
-              className="w-full bg-transparent text-sm outline-none placeholder:text-[#555577]"
+              className="w-full bg-transparent outline-none text-sm placeholder:text-[#666688]"
+              placeholder="søk etter bil eller behov"
             />
-            <SlidersHorizontal size={18} color={ACCENT} />
+            <SlidersHorizontal size={18} className="text-[#FFB84D]" />
           </div>
+        </header>
 
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {[
-              ["smart", "smart"],
-              ["familie", "familie"],
-              ["billigst", "lav kost"],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                onClick={() => setActive(id)}
-                className={`rounded-2xl px-3 py-3 text-xs transition ${
-                  active === id
-                    ? "bg-[#FFB84D] text-[#0A0A0F]"
-                    : "bg-[#0A0A0F] text-[#8888AA]"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <main className="px-5 pt-5 pb-28">
+          <section>
+            <h1 className="text-3xl font-black leading-tight tracking-tight">
+              hva slags bil trenger du?
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-[#8888AA]">
+              Velg behov først. Så finner carctrl bilene som faktisk passer.
+            </p>
 
-        <section className="mt-6 space-y-3">
-          {cars.map((car, index) => (
-            <motion.article
-              key={car.name}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.08 }}
-              className="rounded-[1.75rem] border border-[#1C1C30] bg-[#111118] p-4"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-[#FFB84D]/10 px-2 py-1 text-[11px] text-[#FFB84D]">
-                    <Star size={11} fill={ACCENT} />
-                    {car.tag}
-                  </div>
-                  <h2 className="text-xl font-bold">{car.name}</h2>
-                  <p className="text-sm text-[#8888AA]">{car.type}</p>
-                </div>
-
-                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#0A0A0F]">
-                  <span className="text-lg font-black text-[#FFB84D]">
-                    {car.score}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-3 gap-2">
-                <Metric icon={<Gauge size={15} />} label="pris" value={car.price} />
-                <Metric icon={<BatteryCharging size={15} />} label="rekkevidde" value={car.range} />
-                <Metric icon={<Zap size={15} />} label="kost" value={car.cost} />
-              </div>
-
-              <button className="mt-4 flex w-full items-center justify-between rounded-2xl bg-[#F0F0FF] px-4 py-3 text-sm font-bold text-[#0A0A0F]">
-                se vurdering
-                <ChevronRight size={18} />
-              </button>
-            </motion.article>
-          ))}
-        </section>
-
-        <footer className="mt-auto pt-8 pb-2">
-          <div className="rounded-[1.5rem] border border-[#1C1C30] bg-[#111118]/70 p-4">
-            <div className="flex items-center gap-3">
-              <ShieldCheck size={20} color={ACCENT} />
-              <p className="text-sm text-[#B7B7D6]">
-                uavhengige anbefalinger. ingen forhandlerstøy.
-              </p>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              {needs.map(({ label, icon: Icon }) => {
+                const active = activeNeed === label;
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setActiveNeed(label)}
+                    className={`rounded-[1.5rem] p-4 text-left border transition ${
+                      active
+                        ? "bg-[#FFB84D] text-[#0A0A0F] border-[#FFB84D]"
+                        : "bg-[#111118] border-[#1C1C30] text-[#F0F0FF]"
+                    }`}
+                  >
+                    <Icon size={22} />
+                    <p className="mt-5 text-lg font-bold">{label}</p>
+                  </button>
+                );
+              })}
             </div>
-          </div>
-        </footer>
-      </section>
-    </main>
-  );
-}
+          </section>
 
-function Metric({ icon, label, value }) {
-  return (
-    <div className="rounded-2xl bg-[#0A0A0F] p-3">
-      <div className="mb-2 text-[#FFB84D]">{icon}</div>
-      <p className="text-[10px] uppercase tracking-wide text-[#666688]">{label}</p>
-      <p className="mt-1 text-xs font-semibold text-[#F0F0FF]">{value}</p>
+          <section className="mt-7">
+            <div className="flex items-end justify-between">
+              <div>
+                <h2 className="text-xl font-bold">anbefalt for deg</h2>
+                <p className="text-xs text-[#8888AA]">basert på {activeNeed}</p>
+              </div>
+
+              <button className="text-sm text-[#FFB84D]">se alle</button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {cars.map((car) => (
+                <article
+                  key={car.name}
+                  className="rounded-[1.75rem] bg-[#111118] border border-[#1C1C30] p-4"
+                >
+                  <div className="flex gap-4">
+                    <div className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl bg-[#0A0A0F] border border-[#1C1C30]">
+                      <Car size={34} className="text-[#FFB84D]" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-[11px] text-[#FFB84D] mb-1">
+                            {car.tag}
+                          </p>
+                          <h3 className="font-bold leading-tight">{car.name}</h3>
+                          <p className="text-xs text-[#8888AA]">{car.type}</p>
+                        </div>
+
+                        <div className="rounded-2xl bg-[#FFB84D]/10 px-2 py-1 text-sm font-black text-[#FFB84D]">
+                          {car.match}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-xl bg-[#0A0A0F] p-2">
+                          <p className="text-[#666688]">pris</p>
+                          <p className="font-semibold">{car.price}</p>
+                        </div>
+                        <div className="rounded-xl bg-[#0A0A0F] p-2">
+                          <p className="text-[#666688]">rekkevidde</p>
+                          <p className="font-semibold">{car.range}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button className="mt-4 flex w-full items-center justify-between rounded-2xl bg-[#F0F0FF] px-4 py-3 text-sm font-bold text-[#0A0A0F]">
+                    åpne vurdering
+                    <ChevronRight size={18} />
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-[1.75rem] bg-[#111118] border border-[#1C1C30] p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#FFB84D]/10">
+                <ShieldCheck size={21} className="text-[#FFB84D]" />
+              </div>
+              <div>
+                <h3 className="font-bold">uavhengig bilhjelp</h3>
+                <p className="text-xs text-[#8888AA]">
+                  uten forhandlerstøy og skjulte avtaler
+                </p>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <button className="fixed bottom-24 left-1/2 z-30 grid h-14 w-14 -translate-x-1/2 place-items-center rounded-full bg-[#FFB84D] text-[#0A0A0F] shadow-2xl">
+          <Plus size={26} />
+        </button>
+
+        <nav className="fixed bottom-0 left-1/2 z-20 w-full max-w-[430px] -translate-x-1/2 border-t border-[#1C1C30] bg-[#0A0A0F]/95 px-6 pb-5 pt-3 backdrop-blur-xl">
+          <div className="flex items-center justify-between">
+            <NavItem icon={Home} label="hjem" active />
+            <NavItem icon={Search} label="søk" />
+            <div className="w-10" />
+            <NavItem icon={Heart} label="lagret" />
+            <NavItem icon={User} label="profil" />
+          </div>
+        </nav>
+      </div>
     </div>
   );
 }
 
-export default App;
+function NavItem({ icon: Icon, label, active }) {
+  return (
+    <button
+      className={`flex flex-col items-center gap-1 text-[11px] ${
+        active ? "text-[#FFB84D]" : "text-[#666688]"
+      }`}
+    >
+      <Icon size={21} />
+      {label}
+    </button>
+  );
+}
